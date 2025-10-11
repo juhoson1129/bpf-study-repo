@@ -1,0 +1,43 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # 💡 ARM64 아키텍처를 지원하는 Ubuntu 기반 Box를 사용합니다.
+  # (예: perk/ubuntu-2204-arm64, generic/ubuntu2004 등)
+  # config.vm.box = "perk/ubuntu-2204-arm64"
+  config.vm.box = "cloud-image/ubuntu-24.04"
+
+ 
+  # VM의 호스트 이름을 설정합니다.
+  config.vm.hostname = "ubuntu-m1-vm"
+
+  # QEMU 프로바이더 설정
+  config.vm.provider "qemu" do |qe|
+    # 할당할 메모리와 CPU 코어 수를 지정합니다. (선택 사항)
+    qe.memory = 4096 
+    qe.cpus = 2
+    
+    # QEMU 아키텍처를 ARM64로 설정 (M1/M2 칩의 기본 아키텍처)
+    qe.arch = "aarch64" 
+
+    # HVF(Hypervisor Framework)를 사용하여 네이티브 성능을 활용
+    # qe.machine = "virt,accel=hvf" 
+    # virt,accel=hvf는 vagrant-qemu의 기본값일 가능성이 높으므로 명시하지 않아도 됩니다.
+    
+    # 추가 QEMU 인자를 전달해야 할 경우 사용 (일반적으로 필요하지 않음)
+    # qe.extra_qemu_args = %w(-display none)
+  end
+
+  config.vm.synced_folder ".", "/vagrant", type: "rsync"
+
+  # 네트워크 설정 (선택 사항)
+  # 포트 포워딩 예시: 호스트 8080 포트를 VM의 80 포트로 연결
+  config.vm.network "forwarded_port", guest: 80, host: 8082
+
+  # 프로비저닝 (선택 사항)
+  # VM 부팅 후 실행할 쉘 스크립트 지정
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   sudo apt-get update
+  #   sudo apt-get install -y git 
+  # SHELL
+end
