@@ -1,0 +1,24 @@
+BEGIN
+{
+    printf("starting BPFTrace program\n")
+}
+
+// 아래의 책의 예시대로는 Ubuntu 24.04에서는 동작안함. kprobe같은 커널 내부함수는 커널마다 바뀌고 존재여부도 불투명함
+// kprobe:do_sys_open
+// {
+//   printf("opening file descriptor: %s\n", str(arg1))
+// }
+
+tracepoint:syscalls:sys_enter_openat
+{
+    // 'filename'은 openat tracepoint가 제공하는 인수의 이름입니다.
+    // 'str()' 함수를 사용하여 커널 공간의 포인터에서 문자열을 읽어옵니다.
+    printf("opening file descriptor: %s\n", str(args->filename))
+}
+
+
+
+END
+{
+    printf("closing BPFTrace program \n")
+}
